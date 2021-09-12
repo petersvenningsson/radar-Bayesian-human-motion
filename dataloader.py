@@ -1,6 +1,5 @@
 import os
 import pickle
-import gc
 
 import scipy.io
 import numpy as np
@@ -217,10 +216,7 @@ class DataLoaderSpectrogram():
             df = redefine_classes(df)
             pca = PCA(n_components=20, batch_size=2000)
 
-            downsample = 6 # Downsampling the stratified sampling used to fit the PCA 
-            # Stratified sampling
-            n_stratified_samples = len(df)//(9*downsample)
-            _df = df.groupby('lable', group_keys=False).apply(lambda x: x.sample(n_stratified_samples, replace=True))
+            _df = df.groupby('lable', group_keys=False).apply(lambda x: x.sample(len(df), replace=True))
 
             pca.fit(np.vstack(_df['spectrogram'].to_numpy()))
             components = pca.transform(np.vstack(df['spectrogram'].to_numpy()))
@@ -228,8 +224,6 @@ class DataLoaderSpectrogram():
                 df[f"PC_{i}"] = component
 
             df.drop(['spectrogram'], axis = 1, inplace=True)
-            pickle.dump( df, open( './data/dataset_df', "wb" ) )
-            pickle.dump( pca, open( './data/pca', "wb" ) )
             self.df = df
 
 
@@ -330,13 +324,3 @@ class Spectrogram():
             sample[shift:,:] = self.threshold
 
         return sample
-
-
-if __name__ == '__main__':
-
-    dataset_path = r'C:\Users\peter\Documents\pulseON'
-    dataloader = DataLoaderPulseOnSpect()
-    dataloader.build(dataset_path,'PCA')
-
-    df = pickle.load( open( r'C:\Users\peter\Documents\pulseON\serialized\Harinee\001_mon_wal_Har.pickle', 'rb' ) )
-    print('s')

@@ -8,11 +8,11 @@ from matplotlib import pyplot as plt
 import matplotlib.colors
 from scipy import stats
 
-import processmodels
-import measmodels
-import render
-from density import Gaussian
-import radar_configuration
+from . import processmodels
+from . import measmodels
+from . import render
+from .density import Gaussian
+from . import radar_configuration
 
 def generate_ground_truth(process_model, initial_state, n_steps):
     """ Generates ground truth sequence.

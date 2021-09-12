@@ -1,12 +1,12 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-import processmodels
-import utils
-import measmodels
-import render
-from density import Gaussian
-import radar_configuration
+from . import processmodels
+from . import utils
+from . import measmodels
+from . import render
+from .density import Gaussian
+from . import radar_configuration
 
 
 def simulate_ct_radar():

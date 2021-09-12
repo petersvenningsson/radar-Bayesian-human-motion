@@ -2,8 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.colors
 
-import processmodels
-import utils
+from . import processmodels
+from . import utils
 
 def render_ground_truth(*args, **kwargs):
     

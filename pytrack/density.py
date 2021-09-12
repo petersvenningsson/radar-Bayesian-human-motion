@@ -1,3 +1,4 @@
+import numpy as np
 from scipy.stats import multivariate_normal
 from scipy.stats.distributions import chi2
 

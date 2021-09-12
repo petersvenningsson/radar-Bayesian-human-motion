@@ -1,10 +1,13 @@
+import argparse
+
 import numpy as np
-from sklearn.metrics import accuracy_score, jaccard_score
+from sklearn.metrics import accuracy_score, jaccard_score, balanced_accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
 import dataloader
+import track
 from classifiers import ObservationsConditionsClassifier
 from classifiers import ClassifierComposition
 
@@ -14,6 +17,7 @@ class_set = 9
 n_pca_components = 20
 
 def train():
+    global parsed_args
     test_sequence = 'Mix'
     measurement_costs = [0.1*i for i in range(0,15)]
     measurement_costs.extend([0.01*i for i in range(1, 15)])
@@ -32,7 +36,13 @@ def train():
     for cost in measurement_costs:
         for i_model, (classifier, observation_condition, discriminant_model) in enumerate(classifiers):
 
-            loader.load(f'./data/dataset')
+            if parsed_args.rebuild:
+                track.state_estimation(load_directory = './data/dataset/RD')
+                dataset_path = r'C:\Users\peter\Documents\pulseON'
+                loader = dataloader.DataLoaderSpectrogram()
+                loader.build(dataset_path,'PCA')
+            else:
+                loader.load('./data/dataset_df')
 
             result_df = evaluate_classifier(classifier, loader.df, test_persons = loader.df.person.unique(), test_sequence = test_sequence, measurement_cost = cost)
 
@@ -147,16 +157,22 @@ def estimate_transition_matrix(df):
             transition_count[state - 1, previous_state - 1] += 1 
             previous_state = state
     transition_matrix = transition_count/transition_count.sum(axis=0,keepdims=1)
-    transition_matrix = transition_matrix
     transition_matrix = transition_matrix/transition_matrix.sum(axis=0,keepdims=1)
 
     return transition_matrix
 
 
-def add_point_estimate(loader):
-    point_estimates = np.vstack(loader.df['angle']).argmax(axis=1)
-    loader.df['point_estimate_angle'] = point_estimates
+def load_options():
+    global parsed_args
+    parser = argparse.ArgumentParser(description='Entry point to fit and evaluate\
+                                    a Bayesian model of human motion',
+                                    formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--rebuild', dest='rebuild', action='store_true')
+    parser.add_argument('--no-rebuild', dest='rebuild', action='store_false')
+    parser.set_defaults(rebuild=False)
+    parsed_args = parser.parse_args()
 
 
 if __name__ == '__main__':
+    load_options()
     train()

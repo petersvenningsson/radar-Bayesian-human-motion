@@ -9,16 +9,11 @@ from pytrack import radar_configuration
 from dataloader import DataloaderRangeDoppler
 
 
-def state_estimation():
-
-    # Load experiment
-    load_directory = './data/pulseON/RD'
-
+def state_estimation(load_directory):
     files = []
     for (dirpath, dirnames, filenames) in os.walk(load_directory):
         files += [os.path.join(dirpath, file) for file in filenames]
-    
-    # files = [os.path.join(load_directory, f) for f in os.listdir(load_directory)]
+
     dataloader = DataloaderRangeDoppler(files)
 
     for experiment in dataloader:
@@ -46,8 +41,6 @@ def state_estimation():
                 measurement = Gaussian.ellipsoidalGating(measurements[t], predicted_state, sensor)
                 if measurement is not None:
                     state = Gaussian.update(state, measurement, sensor, linearization=predicted_state.x)
-                else:
-                    print('Missed detection')
             
             state_history.append({'updated_state': state, 'predicted_state': predicted_state})
             predicted_state = Gaussian.predict(state, process_model)
@@ -55,7 +48,6 @@ def state_estimation():
         path = os.path.normpath(experiment['path'])
         save_path = path.split(os.sep)
         save_path[-3] = 'serialized'
-        save_path[0] = '/' 
         save_path = os.path.join(*save_path[:-1])
 
         with open(os.path.join(save_path, experiment['name']+'.pickle'), 'wb') as f:
