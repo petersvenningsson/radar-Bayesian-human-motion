@@ -1,7 +1,7 @@
 # radar-Bayesian-human-motion
 ![](https://img.shields.io/badge/python-v3.7-blue) ![](https://shields.io/badge/license-Apache-blue) ![](https://img.shields.io/badge/Cognative-Radar-brightgreen)
 
-![](images/diagram.png)
+![](images/diagram.PNG)
 
 This repo contains the codebase of the method and results presented in 
 
